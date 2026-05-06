@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+
+datasource db {
+  provider = "postgresql"
+  //url      = env("DATABASE_URL")
+}
+
+model Product {
+  id            String     @id @default(cuid())
+  name          String
+  description   String?
+  price         Decimal
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  cartItems     CartItem[]
+}
+
+// Model Cart : représente un panier d’achat
+model Cart {
+id String @id @default(cuid()) // Identifiant unique auto-généré
+userId String // Identifiant de l’utilisateur propriétaire
+createdAt DateTime @default(now()) // Date de création automatique
+updatedAt DateTime @updatedAt // Date de mise à jour automatique
+items CartItem[] // Relation : un panier contient plusieurs articles
+}
+
+// Model CartItem : représente un article dans un panier (table de liaison)
+model CartItem {
+id String @id @default(cuid()) // Identifiant unique auto-généré
+quantity Int // Quantité de ce produit dans le panier
+cartId String // Clé étrangère vers Cart
+Cart     Cart         @relation(fields: [cartId], references: [id]) // Relation vers Cart
+productId String // Clé étrangère vers Product
+product Product @relation(fields: [productId], references: [id]) // Relation vers Product
+}
